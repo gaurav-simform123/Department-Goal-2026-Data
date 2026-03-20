@@ -1,0 +1,249 @@
+============================================================
+USER STORY 1: Two Factor Authentication on Every Login
+============================================================
+
+Title: User Login with Two Factor Authentication for Every Login Session
+
+User Story:
+As a system administrator/security officer
+I want the system to require Two Factor Authentication (TFA) for every login
+So that user accounts are protected and only authorized users can access the system
+
+============================================================
+Acceptance Criteria:
+============================================================
+
+Scenario 1: Valid TFA Process
+Given a registered user attempts to login with valid credentials
+When the user enters their email and password
+Then the system should prompt for Two Factor Authentication
+And an OTP (One Time Password) should be sent to the user's registered phone/email
+And the user should not be granted access until OTP is verified
+
+Scenario 2: Invalid TFA Code
+Given a user has received an OTP
+When the user enters an incorrect OTP
+Then the system should display an error message
+And the system should not grant access to the account
+And the user should be allowed to request a new OTP
+
+Scenario 3: Multiple Login Attempts
+Given a user logs out and attempts to login again
+When they provide valid credentials
+Then the system should require TFA authentication again
+And not allow skipping TFA validation
+
+Scenario 4: TFA Timeout
+Given an OTP has been sent to a user
+When the OTP expires (assuming standard expiration window)
+Then the user should be prompted to request a new OTP
+And the old OTP should be invalidated
+
+Scenario 5: TFA Successfully Completed
+Given a user has entered a valid OTP
+When the system verifies the OTP
+Then the user should be granted access to their account
+And the session should be established
+
+============================================================
+Notes / Assumptions:
+============================================================
+
+- TFA is triggered for every single login, not just periodic logins
+- OTP delivery mechanism is assumed to be reliable and instant
+- OTP expiration time follows industry standard (typically 5-10 minutes)
+- Users have pre-registered phone number or email for OTP delivery
+- TFA applies to all user types and roles
+- System clock synchronization is important for OTP validation
+- Users should close all existing tabs before logging in to avoid OTP delivery issues
+
+============================================================
+Out of Scope:
+============================================================
+
+- Mobile app authentication (if different from web)
+- Biometric authentication methods
+- Hardware token-based authentication
+- Remember device functionality
+
+
+============================================================
+User Story 2: OTP Delivery Reliability
+============================================================
+
+Title: Reliable OTP Delivery for Two Factor Authentication
+
+User Story:
+As a user
+I want to receive OTP codes reliably and consistently for every login attempt
+So that I can complete authentication without delays or failures
+
+============================================================
+Acceptance Criteria:
+============================================================
+
+Scenario 1: OTP Delivered Successfully
+Given a user has entered valid login credentials
+When TFA is triggered
+Then an OTP should be delivered within 10 seconds
+And the OTP should be delivered to the registered contact method (SMS/Email)
+
+Scenario 2: OTP Not Received
+Given a user is waiting for an OTP
+When the OTP delivery fails (network issue, incorrect phone/email)
+Then the system should display an error message to the user
+And the user should be given an option to request a new OTP
+And the system should log the failed delivery attempt
+
+Scenario 3: Multiple OTP Requests
+Given a user requests multiple OTPs in quick succession
+When each request is made
+Then a new OTP should be generated each time
+And previous OTPs should be invalidated
+And the system should not send duplicate OTPs
+
+Scenario 4: Handling System Load
+Given multiple users are logging in simultaneously
+When OTP requests are triggered
+Then all OTP deliveries should be processed without delays
+And the system should not drop any OTP requests
+
+============================================================
+Notes / Assumptions:
+============================================================
+
+- OTP delivery service has 99.9% uptime
+- Integration with SMS/Email provider is reliable
+- OTP format is numeric (industry standard)
+- OTP length is 4-6 digits
+- Failed OTP deliveries should be retried automatically
+
+============================================================
+Out of Scope:
+============================================================
+
+- Email/SMS provider selection
+- OTP format customization
+- OTP delivery analytics and reporting
+
+
+============================================================
+User Story 3: Multiple Tab Session Management
+============================================================
+
+Title: Handle Multiple Browser Tab Sessions Correctly
+
+User Story:
+As a user
+I want to be able to work with multiple browser tabs without authentication issues
+So that I can efficiently manage multiple sessions using the same account
+
+============================================================
+Acceptance Criteria:
+============================================================
+
+Scenario 1: Single Tab Login Best Practice
+Given a user has multiple tabs open
+When the user closes all other tabs and logs in to a single tab
+Then the login should complete successfully
+And OTP should be delivered without issues
+And the system should establish a secure session
+
+Scenario 2: Tab Duplication After Login
+Given a user is logged in to one tab
+When the user duplicates that tab to create multiple active sessions
+Then all duplicated tabs should maintain the user's session
+And each tab should have access to the user's account
+And OTP validation should not be re-triggered for duplicated tabs
+
+Scenario 3: Multiple Simultaneous Login Attempts (Not Recommended)
+Given a user attempts to login to multiple tabs simultaneously
+When OTP is triggered for each tab
+Then the system should handle this gracefully
+And not fail to deliver OTPs
+And only one session should be active (or system design should handle this scenario)
+
+Scenario 4: Session Consistency Across Tabs
+Given a user is logged in through duplicated tabs
+When the user logs out from one tab
+Then the system should either:
+   Option A: Log out from all tabs, or
+   Option B: Only the current tab is logged out (depending on design)
+And this behavior should be consistent and documented
+
+============================================================
+Notes / Assumptions:
+============================================================
+
+- Users should be instructed to close all tabs before logging in anew
+- Duplicating tabs after login maintains the existing session
+- Session tokens are shared across duplicated tabs
+- OTP delivery issues occur when multiple login attempts happen simultaneously from different tabs
+- System should gracefully handle edge cases where users ignore best practices
+
+============================================================
+Out of Scope:
+============================================================
+
+- Cross-browser session sharing
+- Session recovery mechanisms
+- Session timeout policies (unless related to TFA)
+
+
+============================================================
+User Story 4: TFA Frequency Configuration
+============================================================
+
+Title: Configure TFA Trigger Frequency (Daily/Every Login)
+
+User Story:
+As a system administrator
+I want to be able to configure how frequently TFA is triggered (daily or every login)
+So that I can balance security requirements with user experience
+
+============================================================
+Acceptance Criteria:
+============================================================
+
+Scenario 1: TFA Triggered for Every Login
+Given the system is configured for "TFA every login" mode
+When a user logs out and logs back in
+Then the system should require TFA authentication immediately
+And no exceptions should be made based on time elapsed
+
+Scenario 2: TFA Triggered Daily
+Given the system is configured for "TFA daily" mode
+When a user logs in on the same day after a previous login
+Then TFA should not be required (if already authenticated once that day)
+And the user should only see TFA prompt once per calendar day
+
+Scenario 3: TFA Frequency Configuration by Admin
+Given an administrator has access to system settings
+When the administrator changes TFA frequency setting
+Then the change should apply to all subsequent logins
+And the change should be logged for audit purposes
+And no existing sessions should be affected until next login
+
+Scenario 4: Configuration Takes Effect
+Given a system is changed from "daily" to "every login" frequency
+When users next attempt to login
+Then the new frequency rule should apply
+And users should see the new behavior immediately
+
+============================================================
+Notes / Assumptions:
+============================================================
+
+- Current production requirement is "TFA for every login"
+- System has the capability to store and apply frequency settings
+- Configuration can be changed without redeploying code
+- Time zones are properly handled for daily frequency
+- Audit logging captures all frequency changes
+
+============================================================
+Out of Scope:
+============================================================
+
+- Per-user TFA frequency customization
+- Conditional TFA based on login location or device
+- TFA bypass mechanisms
