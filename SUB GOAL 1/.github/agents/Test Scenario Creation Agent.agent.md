@@ -167,4 +167,4 @@ AC1 → TS-01, TS-02
 AC2 → TS-03  
 
 ## Notes: 
-- After Test Scenario creation completion, store that into a separate file in .csv format with the same name as the user story title and save that file into TestScenarios folder in the root directory of the repository.if TestScenarios folder does not exist, create it first.
+- After Test Scenario creation completion, store that into a separate file in .csv format with the same name as the user story title and save that file into TestScenarios folder in the root directory of the repository.if TestScenarios folder does not exist, create it firstly.
